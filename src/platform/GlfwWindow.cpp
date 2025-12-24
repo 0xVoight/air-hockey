@@ -35,10 +35,15 @@ GlfwWindow::~GlfwWindow()
 void GlfwWindow::pollEvents()
 {
     glfwPollEvents();
-    m_input.up    = glfwGetKey(m_handle, GLFW_KEY_W) == GLFW_PRESS;
-    m_input.down  = glfwGetKey(m_handle, GLFW_KEY_S) == GLFW_PRESS;
-    m_input.left  = glfwGetKey(m_handle, GLFW_KEY_A) == GLFW_PRESS;
-    m_input.right = glfwGetKey(m_handle, GLFW_KEY_D) == GLFW_PRESS;
+    m_input.player1.up    = glfwGetKey(m_handle, GLFW_KEY_W) == GLFW_PRESS;
+    m_input.player1.down  = glfwGetKey(m_handle, GLFW_KEY_S) == GLFW_PRESS;
+    m_input.player1.left  = glfwGetKey(m_handle, GLFW_KEY_A) == GLFW_PRESS;
+    m_input.player1.right = glfwGetKey(m_handle, GLFW_KEY_D) == GLFW_PRESS;
+
+    m_input.player2.up    = (glfwGetKey(m_handle, GLFW_KEY_UP)    == GLFW_PRESS);
+    m_input.player2.down  = (glfwGetKey(m_handle, GLFW_KEY_DOWN)  == GLFW_PRESS);
+    m_input.player2.left  = (glfwGetKey(m_handle, GLFW_KEY_LEFT)  == GLFW_PRESS);
+    m_input.player2.right = (glfwGetKey(m_handle, GLFW_KEY_RIGHT) == GLFW_PRESS);
 }
 
 void GlfwWindow::swapBuffers()

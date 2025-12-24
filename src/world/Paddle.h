@@ -1,10 +1,10 @@
 #pragma once
 
-#include "math/Vec2.h"
+#include "math/Math.h"
 
 struct Paddle {
-    Vec2 position;
-    Vec2 velocity;
+    Vec2 position{0.0f, 0.0f};
+    Vec2 velocity{0.0f, 0.0f};
 
     float radius = 0.06f;
 };

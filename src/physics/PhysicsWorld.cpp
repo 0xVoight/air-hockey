@@ -10,25 +10,16 @@ void PhysicsWorld::simulate(World& world, double dt)
 
 void PhysicsWorld::moveObjects(World& world, double dt)
 {
-    // Плейн физика: позиция += скорость * dt
-    world.puck.position.x += world.puck.velocity.x * static_cast<float>(dt);
-    world.puck.position.y += world.puck.velocity.y * static_cast<float>(dt);
+    const float fDt = static_cast<float>(dt);
+    const float frictionFactor = 1.0f - m_friction;
 
-    world.leftPaddle.position.x += world.leftPaddle.velocity.x * static_cast<float>(dt);
-    world.leftPaddle.position.y += world.leftPaddle.velocity.y * static_cast<float>(dt);
+    world.puck.position += world.puck.velocity * fDt;
+    world.leftPaddle.position += world.leftPaddle.velocity * fDt;
+    world.rightPaddle.position += world.rightPaddle.velocity * fDt;
 
-    world.rightPaddle.position.x += world.rightPaddle.velocity.x * static_cast<float>(dt);
-    world.rightPaddle.position.y += world.rightPaddle.velocity.y * static_cast<float>(dt);
-
-    // применяем трение
-    world.puck.velocity.x *= (1.0f - m_friction);
-    world.puck.velocity.y *= (1.0f - m_friction);
-
-    world.leftPaddle.velocity.x *= (1.0f - m_friction);
-    world.leftPaddle.velocity.y *= (1.0f - m_friction);
-
-    world.rightPaddle.velocity.x *= (1.0f - m_friction);
-    world.rightPaddle.velocity.y *= (1.0f - m_friction);
+    world.puck.velocity *= frictionFactor;
+    world.leftPaddle.velocity *= frictionFactor;
+    world.rightPaddle.velocity *= frictionFactor;
 }
 
 void PhysicsWorld::handleCollisions(World& world)
@@ -53,24 +44,24 @@ void PhysicsWorld::handleCollisions(World& world)
             world.puck.position.y = world.rink.top - world.puck.radius;
     }
 
-    // коллизии с битами
-    auto handleCircleCollision = [this](Vec2& pos1, Vec2& vel1, const Vec2& pos2, float r1, float r2){
-        Vec2 delta{pos1.x - pos2.x, pos1.y - pos2.y};
-        float dist2 = delta.x*delta.x + delta.y*delta.y;
-        float r = r1 + r2;
-        if (dist2 < r*r) {
-            float dist = std::sqrt(dist2);
-            if (dist == 0.f) dist = 0.0001f;
-            float overlap = r - dist;
+    auto handleCircleCollision = [this](Vec2& pos1, Vec2& vel1, const Vec2& pos2, float r1, float r2) {
+        Vec2 delta = pos1 - pos2;
+        float distSq = glm::dot(delta, delta);
+        float rSum = r1 + r2;
 
-            // корректировка позиции
-            pos1.x += (delta.x / dist) * overlap;
-            pos1.y += (delta.y / dist) * overlap;
+        if (distSq < rSum * rSum) {
+            float dist = std::sqrt(distSq);
+            if (dist < 1e-4f) dist = 1e-4f;
 
-            // отражение скорости
-            float dot = vel1.x*delta.x + vel1.y*delta.y;
-            vel1.x -= 2 * dot / dist2 * delta.x * m_restitution;
-            vel1.y -= 2 * dot / dist2 * delta.y * m_restitution;
+            Vec2 normal = delta / dist;
+            float overlap = rSum - dist;
+
+            pos1 += normal * overlap;
+
+            float dotProduct = glm::dot(vel1, normal);
+            if (dotProduct < 0) {
+                vel1 = (vel1 - 2.0f * dotProduct * normal) * m_restitution;
+            }
         }
     };
 
@@ -78,28 +69,44 @@ void PhysicsWorld::handleCollisions(World& world)
     handleCircleCollision(world.puck.position, world.puck.velocity, world.rightPaddle.position, world.puck.radius, world.rightPaddle.radius);
 }
 
+void PhysicsWorld::processPaddleMovement(Paddle &paddle, const PlayerInput &pInput, const Rink &rink, bool isLeft, float dt)
+{
+    const float speed = 1.0f;
+    Vec2 dir{0.f, 0.f};
+
+    if(pInput.up)    dir.y += 1.f;
+    if(pInput.down)  dir.y -= 1.f;
+    if(pInput.left)  dir.x -= 1.f;
+    if(pInput.right) dir.x += 1.f;
+
+    if (glm::length(dir) > 0.0001f) {
+        paddle.velocity = glm::normalize(dir) * speed;
+    } else {
+        paddle.velocity = Vec2(0.0f);
+    }
+
+    paddle.position += paddle.velocity * dt;
+
+    // Расчет границ (Clamping)
+    const float r = paddle.radius;
+
+    // Y-границы одинаковы для всех
+    paddle.position.y = glm::clamp(paddle.position.y, rink.bottom + r, rink.top - r);
+
+    // X-границы зависят от стороны
+    if (isLeft) {
+        paddle.position.x = glm::clamp(paddle.position.x, rink.left + r, 0.0f - r);
+    } else {
+        paddle.position.x = glm::clamp(paddle.position.x, 0.0f + r, rink.right - r);
+    }
+}
+
 void PhysicsWorld::applyPlayerInput(World &world, const InputState &input, double dt)
 {
-    float speed = 1.0f;
+    const float fDt = static_cast<float>(dt);
 
-    Vec2 dir{0.f, 0.f};
-    if(input.up)    dir.y += 1.f;
-    if(input.down)  dir.y -= 1.f;
-    if(input.left)  dir.x -= 1.f;
-    if(input.right) dir.x += 1.f;
-
-    world.leftPaddle.velocity = dir.normalized() * speed;
-    world.leftPaddle.position += world.leftPaddle.velocity * static_cast<float>(dt);
-
-    // ограничиваем движение внутри rink
-    if(world.leftPaddle.position.x - world.leftPaddle.radius < world.rink.left)
-        world.leftPaddle.position.x = world.rink.left + world.leftPaddle.radius;
-    if(world.leftPaddle.position.x + world.leftPaddle.radius > 0.f)
-        world.leftPaddle.position.x = 0.f - world.leftPaddle.radius;
-
-    if(world.leftPaddle.position.y - world.leftPaddle.radius < world.rink.bottom)
-        world.leftPaddle.position.y = world.rink.bottom + world.leftPaddle.radius;
-    if(world.leftPaddle.position.y + world.leftPaddle.radius > world.rink.top)
-        world.leftPaddle.position.y = world.rink.top - world.leftPaddle.radius;
+    // Обрабатываем обе ракетки независимо
+    processPaddleMovement(world.leftPaddle, input.player1, world.rink, true, fDt);
+    processPaddleMovement(world.rightPaddle, input.player2, world.rink, false, fDt);
 }
 

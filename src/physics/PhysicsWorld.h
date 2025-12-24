@@ -17,6 +17,7 @@ public:
 private:
     void moveObjects(World& world, double dt);
     void handleCollisions(World& world);
+    void processPaddleMovement(Paddle& paddle, const PlayerInput& pInput, const Rink& rink, bool isLeft, float dt);
 
 private:
     float m_friction    = 0.0f; // замедление по воздуху

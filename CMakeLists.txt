@@ -14,6 +14,10 @@ if(NOT EMSCRIPTEN)
     add_subdirectory(external/glfw)
 endif()
 
+# glm
+add_library(glm INTERFACE)
+target_include_directories(glm INTERFACE external)
+
 # glad
 if(EMSCRIPTEN)
     add_library(glad_web STATIC external/glad-web/src/glad.c)
@@ -38,7 +42,9 @@ set(SRC
 
 add_executable(air-hockey ${SRC})
 
-target_include_directories(air-hockey PRIVATE src external/glm)
+target_include_directories(air-hockey PRIVATE src)
+
+target_link_libraries(air-hockey PRIVATE glm)
 
 if(EMSCRIPTEN)
     target_link_libraries(air-hockey PRIVATE glad_web)
