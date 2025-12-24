@@ -6,5 +6,5 @@ struct Puck {
     Vec2 position;
     Vec2 velocity;
 
-    float radius = 10.0f;
+    float radius = 0.03f;
 };

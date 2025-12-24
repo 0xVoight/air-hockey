@@ -1,7 +1,5 @@
 #include "Application.h"
 
-#include "Application.h"
-
 #include "platform/Window.h"
 #include "platform/GlfwWindow.h"
 
