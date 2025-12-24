@@ -16,8 +16,8 @@ struct Vec2 {
     Vec2& operator+=(const Vec2& rhs) { x += rhs.x; y += rhs.y; return *this; }
     Vec2& operator-=(const Vec2& rhs) { x -= rhs.x; y -= rhs.y; return *this; }
 
-    float length() const { return std::sqrt(x*x + y*y); }
-    Vec2 normalized() const {
+    [[nodiscard]] float length() const { return std::sqrt(x*x + y*y); }
+    [[nodiscard]] Vec2 normalized() const {
         float len = length();
         if (len == 0.f) return {0.f, 0.f};
         return {x / len, y / len};

@@ -1,12 +1,12 @@
 #include "Application.h"
 
-#include "platform/Window.h"
+#include "platform/IWindow.h"
 #include "platform/GlfwWindow.h"
 
 #include "core/Game.h"
 #include "core/Time.h"
 
-#include "render/Renderer.h"
+#include "render/IRenderer.h"
 #include "render/OpenGLRenderer.h"
 
 Application::Application() = default;

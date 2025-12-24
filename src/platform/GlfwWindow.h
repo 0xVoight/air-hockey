@@ -1,10 +1,10 @@
 #pragma once
 
-#include "Window.h"
+#include "IWindow.h"
 
 struct GLFWwindow;
 
-class GlfwWindow final : public Window {
+class GlfwWindow final : public IWindow {
 public:
     GlfwWindow(int width, int height, const char* title);
     ~GlfwWindow() override;

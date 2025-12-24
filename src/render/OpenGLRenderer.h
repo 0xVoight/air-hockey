@@ -1,11 +1,11 @@
 #pragma once
 
-#include "Renderer.h"
-#include "platform/Window.h"
+#include "IRenderer.h"
+#include "platform/IWindow.h"
 
-class OpenGLRenderer final : public Renderer {
+class OpenGLRenderer final : public IRenderer {
 public:
-    explicit OpenGLRenderer(const Window& window);
+    explicit OpenGLRenderer(const IWindow& window);
     ~OpenGLRenderer() override;
 
     void beginFrame() override;
@@ -15,5 +15,5 @@ public:
     static inline void drawCircle(float x, float y, float radius, int segments = 32);
 
 private:
-    const Window& m_window;
+    const IWindow& m_window;
 };

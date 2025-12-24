@@ -10,7 +10,7 @@ public:
     void update(double dt);
 
     // Чтение
-    const World& world() const { return m_world; }
+    [[nodiscard]] const World& world() const { return m_world; }
 
     // Модификация
     World& world() { return m_world; }

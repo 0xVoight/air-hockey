@@ -2,9 +2,9 @@
 
 #include <memory>
 
-class Window;
+class IWindow;
 class Game;
-class Renderer;
+class IRenderer;
 
 class Application {
 public:
@@ -21,7 +21,7 @@ private:
 private:
     bool m_running = false;
 
-    std::unique_ptr<Window>   m_window;
+    std::unique_ptr<IWindow>   m_window;
     std::unique_ptr<Game>     m_game;
-    std::unique_ptr<Renderer> m_renderer;
+    std::unique_ptr<IRenderer> m_renderer;
 };

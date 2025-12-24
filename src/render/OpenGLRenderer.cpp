@@ -4,7 +4,7 @@
 
 #include <GL/gl.h>
 
-OpenGLRenderer::OpenGLRenderer(const Window& window)
+OpenGLRenderer::OpenGLRenderer(const IWindow& window)
     : m_window(window)
 {
     glViewport(0, 0, m_window.width(), m_window.height());

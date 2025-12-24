@@ -2,9 +2,9 @@
 
 class World;
 
-class Renderer {
+class IRenderer {
 public:
-    virtual ~Renderer() = default;
+    virtual ~IRenderer() = default;
 
     virtual void beginFrame() = 0;
     virtual void render(const World& world) = 0;
