@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <vector>
+
 #include "math/Math.h"
 #include "IRenderer.h"
 #include "platform/IWindow.h"
@@ -21,19 +22,21 @@ public:
 
 private:
     void setupResources();
-    void drawCircle(const Vec2& position, float radius, const glm::vec3& color);
-    glm::mat4 calculateProjection() const;
+    void drawCircle(const glm::vec2& position, float radius, const glm::vec3& color);
+    void updateProjection();
+    glm::vec2 worldToScreen(const glm::vec2& worldPos) const;
 
 private:
     const IWindow& m_window;
 
-    // Ресурсы для льда
+    // todo: resource manager
+    // лед
     std::unique_ptr<Shader> m_iceShader;
     std::unique_ptr<VertexArray> m_iceVAO;
     std::unique_ptr<Texture> m_iceTexture;
     uint32_t m_iceVBO = 0;
 
-    // Круги (шайба и палки)
+    // Круги
     std::unique_ptr<Shader> m_circleShader;
     std::unique_ptr<VertexArray> m_circleVAO;
     uint32_t m_circleVBO = 0;
@@ -47,9 +50,7 @@ private:
 
     float m_goalLineRadius = 0.05f;
 
-    // Проекция
     glm::mat4 m_projection = glm::mat4(1.0f);
 
-    // Сохраняем rink для расчета проекции
     Rink m_worldRink;
 };

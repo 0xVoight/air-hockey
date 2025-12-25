@@ -1,8 +1,8 @@
 #pragma once
 
 struct Rink {
-    float left   = -1.75f;
-    float right  =  1.75f;
+    float left   = -1.88f;
+    float right  =  1.88f;
     float top    =  1.0f;
     float bottom = -1.0f;
 
