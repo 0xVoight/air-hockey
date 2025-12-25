@@ -41,6 +41,7 @@ set(SRC
     src/render/VertexArray.cpp
     src/platform/GlfwWindow.cpp
     src/platform/EmsWindow.cpp
+    external/stb_image/stb_image.cpp
 )
 
 add_executable(air-hockey ${SRC})

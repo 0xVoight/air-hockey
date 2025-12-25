@@ -1,6 +1,7 @@
 #include "Shader.h"
 
-Shader::Shader(const std::string& vertexPath, const std::string& fragmentPath) {
+Shader::Shader(const std::string& vertexPath, const std::string& fragmentPath)
+{
     std::string vCode = readFile(vertexPath);
     std::string fCode = readFile(fragmentPath);
 
@@ -33,69 +34,90 @@ Shader::Shader(const std::string& vertexPath, const std::string& fragmentPath) {
     glDeleteShader(fragment);
 }
 
-Shader::~Shader() {
-    if (m_id != 0) {
+Shader::~Shader()
+{
+    if (m_id != 0)
+    {
         glDeleteProgram(m_id);
     }
 }
 
-void Shader::use() const {
+void Shader::use() const
+{
     glUseProgram(m_id);
 }
 
-std::string Shader::readFile(const std::string& path) {
+std::string Shader::readFile(const std::string& path)
+{
     std::ifstream file;
     file.exceptions(std::ifstream::failbit | std::ifstream::badbit);
-    try {
+    try
+    {
         file.open(path);
         std::stringstream stream;
         stream << file.rdbuf();
         return stream.str();
-    } catch (const std::ifstream::failure& e) {
+    }
+    catch (const std::ifstream::failure& e)
+    {
         std::cerr << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ: " << path << std::endl;
         return "";
     }
 }
 
-int32_t Shader::getUniformLocation(const std::string& name) const {
-    if (m_uniformLocationCache.find(name) != m_uniformLocationCache.end()) {
+int32_t Shader::getUniformLocation(const std::string& name) const
+{
+    if (m_uniformLocationCache.find(name) != m_uniformLocationCache.end())
+    {
         return m_uniformLocationCache[name];
     }
-    int32_t location = glGetUniformLocation(m_id, name.c_str());
+    const int32_t location = glGetUniformLocation(m_id, name.c_str());
     m_uniformLocationCache[name] = location;
     return location;
 }
 
-void Shader::setMat4(const std::string& name, const glm::mat4& mat) const {
+void Shader::setMat4(const std::string& name, const glm::mat4& mat) const
+{
     glUniformMatrix4fv(getUniformLocation(name), 1, GL_FALSE, &mat[0][0]);
 }
 
-void Shader::setVec3(const std::string& name, const glm::vec3& value) const {
+void Shader::setVec3(const std::string& name, const glm::vec3& value) const
+{
     glUniform3fv(getUniformLocation(name), 1, &value[0]);
 }
 
-void Shader::setVec2(const std::string& name, const glm::vec2& value) const {
+void Shader::setVec2(const std::string& name, const glm::vec2& value) const
+{
     glUniform2fv(getUniformLocation(name), 1, &value[0]);
 }
 
-void Shader::setFloat(const std::string& name, float value) const {
+void Shader::setFloat(const std::string& name, float value) const
+{
     glUniform1f(getUniformLocation(name), value);
 }
 
-void Shader::checkCompileErrors(uint32_t shader, const std::string& type) {
+void Shader::checkCompileErrors(const uint32_t shader, const std::string& type)
+{
     int success;
     char infoLog[1024];
-    if (type != "PROGRAM") {
+    if (type != "PROGRAM")
+    {
         glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
-        if (!success) {
+        if (!success)
+        {
             glGetShaderInfoLog(shader, 1024, nullptr, infoLog);
-            std::cerr << "ERROR::SHADER_COMPILATION_ERROR of type: " << type << "\n" << infoLog << "\n -- --------------------------------------------------- -- " << std::endl;
+            std::cerr << "ERROR::SHADER_COMPILATION_ERROR of type: " << type << "\n" << infoLog <<
+                "\n -- --------------------------------------------------- -- " << std::endl;
         }
-    } else {
+    }
+    else
+    {
         glGetProgramiv(shader, GL_LINK_STATUS, &success);
-        if (!success) {
+        if (!success)
+        {
             glGetProgramInfoLog(shader, 1024, nullptr, infoLog);
-            std::cerr << "ERROR::PROGRAM_LINKING_ERROR of type: " << type << "\n" << infoLog << "\n -- --------------------------------------------------- -- " << std::endl;
+            std::cerr << "ERROR::PROGRAM_LINKING_ERROR of type: " << type << "\n" << infoLog <<
+                "\n -- --------------------------------------------------- -- " << std::endl;
         }
     }
 }

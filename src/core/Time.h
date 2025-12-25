@@ -2,13 +2,16 @@
 
 #include <chrono>
 
-class Time {
+class Time
+{
 public:
-    Time() : m_last(std::chrono::high_resolution_clock::now()) {}
+    Time() : m_last(std::chrono::high_resolution_clock::now())
+    {
+    }
 
     void update();
 
-    double delta() const { return m_delta; }
+    [[nodiscard]] double delta() const { return m_delta; }
 
 private:
     std::chrono::high_resolution_clock::time_point m_last;

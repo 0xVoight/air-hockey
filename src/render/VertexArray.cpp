@@ -1,36 +1,43 @@
 #include "VertexArray.h"
 
 // Специализации шаблона для разных типов данных
-template<>
-void VertexBufferLayout::push<float>(uint32_t count) {
-    m_elements.push_back({ GL_FLOAT, count, GL_FALSE });
+template <>
+void VertexBufferLayout::push<float>(const uint32_t count)
+{
+    m_elements.push_back({GL_FLOAT, count, GL_FALSE});
     m_stride += count * VertexBufferElement::getSizeOfType(GL_FLOAT);
 }
 
-VertexArray::VertexArray() {
+VertexArray::VertexArray()
+{
     glGenVertexArrays(1, &m_id);
 }
 
-VertexArray::~VertexArray() {
+VertexArray::~VertexArray()
+{
     glDeleteVertexArrays(1, &m_id);
 }
 
-void VertexArray::bind() const {
+void VertexArray::bind() const
+{
     glBindVertexArray(m_id);
 }
 
-void VertexArray::unbind() const {
+void VertexArray::unbind() const
+{
     glBindVertexArray(0);
 }
 
-void VertexArray::addBuffer(uint32_t vbo, const VertexBufferLayout& layout) {
+void VertexArray::addBuffer(const uint32_t vbo, const VertexBufferLayout& layout) const
+{
     bind();
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
     const auto& elements = layout.getElements();
     uint64_t offset = 0;
 
-    for (uint32_t i = 0; i < elements.size(); i++) {
+    for (uint32_t i = 0; i < elements.size(); i++)
+    {
         const auto& element = elements[i];
 
         glEnableVertexAttribArray(i);
@@ -40,9 +47,9 @@ void VertexArray::addBuffer(uint32_t vbo, const VertexBufferLayout& layout) {
             element.type,
             element.normalized,
             layout.getStride(),
-            (const void*)offset
-            );
+            reinterpret_cast<const void*>(offset)
+        );
 
-        offset += (uint64_t)element.count * VertexBufferElement::getSizeOfType(element.type);
+        offset += static_cast<uint64_t>(element.count) * VertexBufferElement::getSizeOfType(element.type);
     }
 }

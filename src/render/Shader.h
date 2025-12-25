@@ -8,7 +8,8 @@
 #include <sstream>
 #include <iostream>
 
-class Shader final {
+class Shader final
+{
 public:
     Shader(const std::string& vertexPath, const std::string& fragmentPath);
     ~Shader();
@@ -17,8 +18,11 @@ public:
     Shader& operator=(const Shader&) = delete;
 
     Shader(Shader&& other) noexcept : m_id(other.m_id) { other.m_id = 0; }
-    Shader& operator=(Shader&& other) noexcept {
-        if (this != &other) {
+
+    Shader& operator=(Shader&& other) noexcept
+    {
+        if (this != &other)
+        {
             glDeleteProgram(m_id);
             m_id = other.m_id;
             other.m_id = 0;

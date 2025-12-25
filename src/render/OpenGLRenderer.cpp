@@ -9,27 +9,30 @@ OpenGLRenderer::OpenGLRenderer(const IWindow& window)
     setupResources();
 }
 
-OpenGLRenderer::~OpenGLRenderer() {
+OpenGLRenderer::~OpenGLRenderer()
+{
     glDeleteBuffers(1, &m_circleVBO);
     glDeleteBuffers(1, &m_rinkLinesVBO);
     glDeleteBuffers(1, &m_iceVBO);
 }
 
-void OpenGLRenderer::setupResources() {
+void OpenGLRenderer::setupResources()
+{
     m_circleShader = std::make_unique<Shader>("assets/shaders/gl_circle.vert", "assets/shaders/gl_circle.frag");
 
-    const int segments = 64;
-    std::vector<Vec2> circleVerts;
-    circleVerts.push_back({0.f, 0.f});
-    for (int i = 0; i <= segments; ++i) {
-        float angle = i / float(segments) * 2.0f * glm::pi<float>();
-        circleVerts.push_back({std::cos(angle), std::sin(angle)});
+    constexpr int segments = 64;
+    std::vector<glm::vec2> circleVerts;
+    circleVerts.emplace_back(0.f, 0.f);
+    for (int i = 0; i <= segments; ++i)
+    {
+        const float angle = i / static_cast<float>(segments) * 2.0f * glm::pi<float>();
+        circleVerts.emplace_back(std::cos(angle), std::sin(angle));
     }
     m_circleVertexCount = static_cast<uint32_t>(circleVerts.size());
 
     glGenBuffers(1, &m_circleVBO);
     glBindBuffer(GL_ARRAY_BUFFER, m_circleVBO);
-    glBufferData(GL_ARRAY_BUFFER, circleVerts.size() * sizeof(Vec2), circleVerts.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, circleVerts.size() * sizeof(glm::vec2), circleVerts.data(), GL_STATIC_DRAW);
 
     m_circleVAO = std::make_unique<VertexArray>();
     VertexBufferLayout layout;
@@ -39,27 +42,27 @@ void OpenGLRenderer::setupResources() {
     ///
     m_lineShader = std::make_unique<Shader>("assets/shaders/gl_line.vert", "assets/shaders/gl_line.frag");
 
-    std::vector<Vec2> rinkLineVertices;
+    std::vector<glm::vec2> rinkLineVertices;
     // границы
-    rinkLineVertices.push_back({m_worldRink.left, m_worldRink.bottom});
-    rinkLineVertices.push_back({m_worldRink.right, m_worldRink.bottom});
-    rinkLineVertices.push_back({m_worldRink.right, m_worldRink.top});
-    rinkLineVertices.push_back({m_worldRink.left, m_worldRink.top});
+    rinkLineVertices.emplace_back(m_worldRink.left, m_worldRink.bottom);
+    rinkLineVertices.emplace_back(m_worldRink.right, m_worldRink.bottom);
+    rinkLineVertices.emplace_back(m_worldRink.right, m_worldRink.top);
+    rinkLineVertices.emplace_back(m_worldRink.left, m_worldRink.top);
     // центр
-    rinkLineVertices.push_back({0.f, m_worldRink.bottom});
-    rinkLineVertices.push_back({0.f, m_worldRink.top});
+    rinkLineVertices.emplace_back(0.f, m_worldRink.bottom);
+    rinkLineVertices.emplace_back(0.f, m_worldRink.top);
     // ворота
     float goalWidth = m_goalLineRadius;
-    rinkLineVertices.push_back({m_worldRink.left, goalWidth});
-    rinkLineVertices.push_back({m_worldRink.left, -goalWidth});
-    rinkLineVertices.push_back({m_worldRink.right, goalWidth});
-    rinkLineVertices.push_back({m_worldRink.right, -goalWidth});
+    rinkLineVertices.emplace_back(m_worldRink.left, goalWidth);
+    rinkLineVertices.emplace_back(m_worldRink.left, -goalWidth);
+    rinkLineVertices.emplace_back(m_worldRink.right, goalWidth);
+    rinkLineVertices.emplace_back(m_worldRink.right, -goalWidth);
 
     m_rinkLinesVertexCount = static_cast<uint32_t>(rinkLineVertices.size());
 
     glGenBuffers(1, &m_rinkLinesVBO);
     glBindBuffer(GL_ARRAY_BUFFER, m_rinkLinesVBO);
-    glBufferData(GL_ARRAY_BUFFER, rinkLineVertices.size() * sizeof(Vec2), rinkLineVertices.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, rinkLineVertices.size() * sizeof(glm::vec2), rinkLineVertices.data(), GL_STATIC_DRAW);
 
     m_rinkLinesVAO = std::make_unique<VertexArray>();
     VertexBufferLayout lineLayout;
@@ -84,17 +87,18 @@ void OpenGLRenderer::setupResources() {
     m_iceVAO->unbind();
 }
 
-void OpenGLRenderer::updateProjection() {
-    float w = float(m_window.width());
-    float h = float(m_window.height());
+void OpenGLRenderer::updateProjection()
+{
+    const auto w = static_cast<float>(m_window.width());
+    const auto h = static_cast<float>(m_window.height());
 
     m_projection = glm::ortho(0.0f, w, 0.0f, h, -1.0f, 1.0f);
 
-    float iceVerts[] = {
-        0.f, 0.f, 0.f, 0.f,       // левый нижний угол
-        w,   0.f, 1.f, 0.f,       // правый нижний угол
-        w,   h,   1.f, 1.f,       // правый верхний угол
-        0.f, h,   0.f, 1.f        // левый верхний угол
+    const float iceVerts[] = {
+        0.f, 0.f, 0.f, 0.f, // левый нижний угол
+        w, 0.f, 1.f, 0.f, // правый нижний угол
+        w, h, 1.f, 1.f, // правый верхний угол
+        0.f, h, 0.f, 1.f // левый верхний угол
     };
 
     glBindBuffer(GL_ARRAY_BUFFER, m_iceVBO);
@@ -102,16 +106,15 @@ void OpenGLRenderer::updateProjection() {
 }
 
 
-
-glm::vec2 OpenGLRenderer::worldToScreen(const glm::vec2 &worldPos) const
+glm::vec2 OpenGLRenderer::worldToScreen(const glm::vec2& worldPos) const
 {
-    float w = float(m_window.width());
-    float h = float(m_window.height());
+    const auto w = static_cast<float>(m_window.width());
+    const auto h = static_cast<float>(m_window.height());
 
     float x = (worldPos.x - m_worldRink.left) / m_worldRink.width() * w;
     float y = (worldPos.y - m_worldRink.bottom) / m_worldRink.height() * h;
 
-    return glm::vec2(x, y);
+    return {x, y};
 }
 
 
@@ -124,7 +127,8 @@ void OpenGLRenderer::beginFrame()
     updateProjection();
 }
 
-void OpenGLRenderer::render(const World& world) {
+void OpenGLRenderer::render(const World& world)
+{
     //Лед
     m_iceShader->use();
     m_iceShader->setMat4("uProjection", m_projection);
@@ -141,10 +145,10 @@ void OpenGLRenderer::render(const World& world) {
     m_lineShader->setMat4("uProjection", m_projection);
     m_lineShader->setVec3("uColor", {0.8f, 0.2f, 0.2f});
 
-    float w = float(m_window.width());
-    float h = float(m_window.height());
+    const auto w = static_cast<float>(m_window.width());
+    const auto h = static_cast<float>(m_window.height());
 
-    glm::mat4 model = glm::mat4(1.0f);
+    auto model = glm::mat4(1.0f);
     model = glm::translate(model, glm::vec3(w / 2.0f, h / 2.0f, 0.0f));
     model = glm::scale(model, glm::vec3(w / 2.0f, h / 2.0f, 1.0f));
 
@@ -172,13 +176,14 @@ void OpenGLRenderer::render(const World& world) {
     glDisable(GL_BLEND);
 }
 
-void OpenGLRenderer::drawCircle(const Vec2& worldPosition, float worldRadius, const glm::vec3& color) {
-    glm::vec2 screenPos = worldToScreen(worldPosition);
+void OpenGLRenderer::drawCircle(const glm::vec2& position, const float radius, const glm::vec3& color) const
+{
+    const glm::vec2 screenPos = worldToScreen(position);
 
-    float w = float(m_window.width());
-    float h = float(m_window.height());
-    float scale = std::min(w / m_worldRink.width(), h / m_worldRink.height());
-    float screenRadius = worldRadius * scale;
+    const auto w = static_cast<float>(m_window.width());
+    const auto h = static_cast<float>(m_window.height());
+    const float scale = std::min(w / m_worldRink.width(), h / m_worldRink.height());
+    const float screenRadius = radius * scale;
 
     m_circleShader->setVec2("uInstancePos", screenPos);
     m_circleShader->setFloat("uInstanceRadius", screenRadius);
@@ -188,4 +193,6 @@ void OpenGLRenderer::drawCircle(const Vec2& worldPosition, float worldRadius, co
 }
 
 
-void OpenGLRenderer::endFrame() {}
+void OpenGLRenderer::endFrame()
+{
+}

@@ -2,14 +2,15 @@
 #include <string>
 #include <glad/glad.h>
 
-class Texture {
+class Texture
+{
 public:
-    Texture(const std::string& path);
+    explicit Texture(const std::string& path);
     ~Texture();
 
     void bind(uint32_t slot = 0) const;
     void unbind() const;
 
 private:
-    uint32_t m_id;
+    uint32_t m_id{};
 };

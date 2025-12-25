@@ -2,7 +2,8 @@
 
 class World;
 
-class IRenderer {
+class IRenderer
+{
 public:
     virtual ~IRenderer() = default;
 

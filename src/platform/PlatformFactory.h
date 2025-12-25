@@ -4,11 +4,12 @@
 #include "IWindow.h"
 #include "../render/IRenderer.h"
 
-class PlatformFactory {
+class PlatformFactory
+{
 public:
     virtual ~PlatformFactory() = default;
 
-    virtual std::unique_ptr<IWindow>  createWindow(int w, int h, const char* title) = 0;
+    virtual std::unique_ptr<IWindow> createWindow(int w, int h, const char* title) = 0;
     virtual std::unique_ptr<IRenderer> createRenderer(const IWindow& window) = 0;
 };
 

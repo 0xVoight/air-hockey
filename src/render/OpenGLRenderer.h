@@ -1,7 +1,6 @@
 #pragma once
 
 #include <memory>
-#include <vector>
 
 #include "math/Math.h"
 #include "IRenderer.h"
@@ -11,7 +10,8 @@
 #include "Texture.h"
 #include "world/World.h"
 
-class OpenGLRenderer final : public IRenderer {
+class OpenGLRenderer final : public IRenderer
+{
 public:
     explicit OpenGLRenderer(const IWindow& window);
     ~OpenGLRenderer() override;
@@ -22,9 +22,9 @@ public:
 
 private:
     void setupResources();
-    void drawCircle(const glm::vec2& position, float radius, const glm::vec3& color);
+    void drawCircle(const glm::vec2& position, float radius, const glm::vec3& color) const;
     void updateProjection();
-    glm::vec2 worldToScreen(const glm::vec2& worldPos) const;
+    [[nodiscard]] glm::vec2 worldToScreen(const glm::vec2& worldPos) const;
 
 private:
     const IWindow& m_window;

@@ -5,7 +5,10 @@
 
 #include "core/Game.h"
 
-Application::Application(std::unique_ptr<PlatformFactory> factory) : m_running(false), m_isPaused(false), m_factory(std::move(factory)) {}
+Application::Application(std::unique_ptr<PlatformFactory> factory) : m_factory(std::move(factory))
+{
+}
+
 Application::~Application() = default;
 
 int Application::run()
@@ -18,7 +21,7 @@ int Application::run()
 
 void Application::init()
 {
-    m_window   = m_factory->createWindow(1280, 720, "Air Hockey");
+    m_window = m_factory->createWindow(1280, 720, "Air Hockey");
     m_renderer = m_factory->createRenderer(*m_window);
 
     m_game = std::make_unique<Game>();
@@ -29,12 +32,14 @@ void Application::loop()
 {
     m_time.update();
 
-    while (m_running && !m_window->shouldClose()) {
+    while (m_running && !m_window->shouldClose())
+    {
         m_time.update();
 
         m_window->pollEvents();
 
-        if (!m_isPaused) {
+        if (!m_isPaused)
+        {
             m_game->update(m_time.delta(), m_window->input());
         }
 
@@ -48,5 +53,4 @@ void Application::loop()
 
 void Application::shutdown()
 {
-
 }

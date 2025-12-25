@@ -4,9 +4,10 @@
 #include <GLFW/glfw3.h>
 #include <stdexcept>
 
-GlfwWindow::GlfwWindow(int width, int height, const char* title)
+GlfwWindow::GlfwWindow(const int width, const int height, const char* title)
 {
-    if (!glfwInit()) {
+    if (!glfwInit())
+    {
         throw std::runtime_error("Failed to initialize GLFW");
     }
 
@@ -15,14 +16,16 @@ GlfwWindow::GlfwWindow(int width, int height, const char* title)
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     m_handle = glfwCreateWindow(width, height, title, nullptr, nullptr);
-    if (!m_handle) {
+    if (!m_handle)
+    {
         glfwTerminate();
         throw std::runtime_error("Failed to create GLFW window");
     }
 
     glfwMakeContextCurrent(m_handle);
 
-    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+    if (!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress)))
+    {
         throw std::runtime_error("Failed to initialize GLAD");
     }
 
@@ -31,7 +34,8 @@ GlfwWindow::GlfwWindow(int width, int height, const char* title)
 
 GlfwWindow::~GlfwWindow()
 {
-    if (m_handle) {
+    if (m_handle)
+    {
         glfwDestroyWindow(m_handle);
         glfwTerminate();
     }
@@ -40,14 +44,14 @@ GlfwWindow::~GlfwWindow()
 void GlfwWindow::pollEvents()
 {
     glfwPollEvents();
-    m_input.player1.up    = glfwGetKey(m_handle, GLFW_KEY_W) == GLFW_PRESS;
-    m_input.player1.down  = glfwGetKey(m_handle, GLFW_KEY_S) == GLFW_PRESS;
-    m_input.player1.left  = glfwGetKey(m_handle, GLFW_KEY_A) == GLFW_PRESS;
+    m_input.player1.up = glfwGetKey(m_handle, GLFW_KEY_W) == GLFW_PRESS;
+    m_input.player1.down = glfwGetKey(m_handle, GLFW_KEY_S) == GLFW_PRESS;
+    m_input.player1.left = glfwGetKey(m_handle, GLFW_KEY_A) == GLFW_PRESS;
     m_input.player1.right = glfwGetKey(m_handle, GLFW_KEY_D) == GLFW_PRESS;
 
-    m_input.player2.up    = (glfwGetKey(m_handle, GLFW_KEY_UP)    == GLFW_PRESS);
-    m_input.player2.down  = (glfwGetKey(m_handle, GLFW_KEY_DOWN)  == GLFW_PRESS);
-    m_input.player2.left  = (glfwGetKey(m_handle, GLFW_KEY_LEFT)  == GLFW_PRESS);
+    m_input.player2.up = (glfwGetKey(m_handle, GLFW_KEY_UP) == GLFW_PRESS);
+    m_input.player2.down = (glfwGetKey(m_handle, GLFW_KEY_DOWN) == GLFW_PRESS);
+    m_input.player2.left = (glfwGetKey(m_handle, GLFW_KEY_LEFT) == GLFW_PRESS);
     m_input.player2.right = (glfwGetKey(m_handle, GLFW_KEY_RIGHT) == GLFW_PRESS);
 }
 

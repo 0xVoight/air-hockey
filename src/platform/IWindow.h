@@ -2,7 +2,8 @@
 
 #include "../core/Input.h"
 
-class IWindow {
+class IWindow
+{
 public:
     virtual ~IWindow() = default;
 

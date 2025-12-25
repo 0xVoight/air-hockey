@@ -5,7 +5,8 @@
 #include "world/World.h"
 #include "physics/PhysicsWorld.h"
 
-class Game {
+class Game
+{
 public:
     Game();
 
