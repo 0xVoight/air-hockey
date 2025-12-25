@@ -2,8 +2,9 @@
 
 PhysicsWorld::PhysicsWorld() = default;
 
-void PhysicsWorld::simulate(World& world, double dt)
+void PhysicsWorld::simulate(World& world, const InputState& input, double dt)
 {
+    processPaddles(world, input);
     moveObjects(world, dt);
     handleCollisions(world);
 }
@@ -89,42 +90,35 @@ void PhysicsWorld::handleCollisions(World& world)
     }
 }
 
-void PhysicsWorld::processPaddleMovement(Paddle &paddle, const PlayerInput &pInput, const Rink &rink, bool isLeft, float dt)
+void PhysicsWorld::processPaddles(World &world, const InputState &input)
 {
-    Vec2 dir{0.f, 0.f};
+    auto applyInput = [&](Paddle& paddle, const PlayerInput& pInput, bool isLeft) {
+        Vec2 dir{0.f, 0.f};
+        if(pInput.up)    dir.y += 1.f;
+        if(pInput.down)  dir.y -= 1.f;
+        if(pInput.left)  dir.x -= 1.f;
+        if(pInput.right) dir.x += 1.f;
 
-    if(pInput.up)    dir.y += 1.f;
-    if(pInput.down)  dir.y -= 1.f;
-    if(pInput.left)  dir.x -= 1.f;
-    if(pInput.right) dir.x += 1.f;
+        if (glm::length(dir) > 0.0001f) {
+            paddle.velocity = glm::normalize(dir) * m_paddleSpeed;
+        } else {
+            paddle.velocity = Vec2(0.0f);
+        }
 
-    if (glm::length(dir) > 0.0001f) {
-        paddle.velocity = glm::normalize(dir) * m_paddleSpeed;
-    } else {
-        paddle.velocity = Vec2(0.0f);
-    }
+        const float r = paddle.radius;
 
-    //paddle.position += paddle.velocity * dt;
+        // Y-границы
+        paddle.position.y = glm::clamp(paddle.position.y, world.rink.bottom + r, world.rink.top - r);
 
-    // Расчет границ
-    const float r = paddle.radius;
+        // X-границы
+        if (isLeft) {
+            paddle.position.x = glm::clamp(paddle.position.x, world.rink.left + r, 0.0f - r);
+        } else {
+            paddle.position.x = glm::clamp(paddle.position.x, 0.0f + r, world.rink.right - r);
+        }
+    };
 
-    // Y-границы
-    paddle.position.y = glm::clamp(paddle.position.y, rink.bottom + r, rink.top - r);
-
-    // X-границы
-    if (isLeft) {
-        paddle.position.x = glm::clamp(paddle.position.x, rink.left + r, 0.0f - r);
-    } else {
-        paddle.position.x = glm::clamp(paddle.position.x, 0.0f + r, rink.right - r);
-    }
-}
-
-void PhysicsWorld::applyPlayerInput(World &world, const InputState &input, double dt)
-{
-    const float fDt = static_cast<float>(dt);
-
-    processPaddleMovement(world.leftPaddle, input.player1, world.rink, true, fDt);
-    processPaddleMovement(world.rightPaddle, input.player2, world.rink, false, fDt);
+    applyInput(world.leftPaddle, input.player1, true);
+    applyInput(world.rightPaddle, input.player2, false);
 }
 

@@ -8,12 +8,12 @@ Game::Game() : m_rng(std::random_device{}())
     reset();
 }
 
-void Game::update(double dt)
+void Game::update(double dt, const InputState& input)
 {
     m_accumulator += dt;
 
     while (m_accumulator >= FIXED_DT) {
-        fixedUpdate(FIXED_DT);
+        m_physics.simulate(m_world, input, FIXED_DT);
         m_accumulator -= FIXED_DT;
     }
 }
@@ -39,5 +39,5 @@ void Game::reset()
 
 void Game::fixedUpdate(double fixedDt)
 {
-    m_physics.simulate(m_world, fixedDt);
+    //m_physics.simulate(m_world, fixedDt);
 }

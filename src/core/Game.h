@@ -9,7 +9,7 @@ class Game {
 public:
     Game();
 
-    void update(double dt);
+    void update(double dt, const InputState& input);
     void reset();
 
     // Чтение
