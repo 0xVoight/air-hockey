@@ -9,7 +9,7 @@ class Game {
 public:
     Game();
 
-    void update(double dt);
+    void update(double dt, const InputState& input);
     void reset();
 
     // Чтение
@@ -20,7 +20,7 @@ public:
     PhysicsWorld& physics() { return m_physics; }
 
 private:
-    void fixedUpdate(double fixedDt);
+    void fixedUpdate(double fixedDt, const InputState& input);
 
 private:
     World m_world;

@@ -5,7 +5,6 @@
 
 #include "core/Game.h"
 
-
 Application::Application(std::unique_ptr<PlatformFactory> factory) : m_running(false), m_isPaused(false), m_factory(std::move(factory)) {}
 Application::~Application() = default;
 
@@ -32,13 +31,11 @@ void Application::loop()
 
     while (m_running && !m_window->shouldClose()) {
         m_time.update();
-        const double dt = m_time.delta();
 
         m_window->pollEvents();
 
         if (!m_isPaused) {
-            m_game->physics().applyPlayerInput(m_game->world(), m_window->input(), dt);
-            m_game->update(dt);
+            m_game->update(m_time.delta(), m_window->input());
         }
 
         m_renderer->beginFrame();

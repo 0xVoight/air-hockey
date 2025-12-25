@@ -8,16 +8,15 @@ public:
     PhysicsWorld();
 
     // фиксированный шаг симуляции
-    void simulate(World& world, double dt);
+    void simulate(World& world, const InputState& input, double dt);
 
     void setFriction(float friction) { m_friction = friction; }
     void setRestitution(float restitution) { m_restitution = restitution; }
 
-    void applyPlayerInput(World& world, const InputState& input, double dt);
 private:
     void moveObjects(World& world, double dt);
     void handleCollisions(World& world);
-    void processPaddleMovement(Paddle& paddle, const PlayerInput& pInput, const Rink& rink, bool isLeft, float dt);
+    void processPaddles(World& world, const InputState& input);
 
 private:
     float m_friction        = 0.15f; // замедление по воздуху
