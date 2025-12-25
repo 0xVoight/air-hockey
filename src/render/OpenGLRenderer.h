@@ -1,5 +1,8 @@
 #pragma once
 
+#include <vector>
+
+#include "math/Math.h"
 #include "IRenderer.h"
 #include "platform/IWindow.h"
 
@@ -12,8 +15,12 @@ public:
     void render(const World& world) override;
     void endFrame() override;
 
-    static inline void drawCircle(float x, float y, float radius, int segments = 32);
+    inline void drawCircle(float x, float y, float radius);
+
+private:
+    void precomputeCircleGeometry(int segments);
 
 private:
     const IWindow& m_window;
+    std::vector<Vec2> m_unitCircleVertices;
 };

@@ -22,7 +22,7 @@ private:
 private:
     float m_friction        = 0.15f; // замедление по воздуху
     float m_restitution     = 0.95f; // упругость ударов
-    float m_paddleSpeed     = 1.0f;
+    float m_paddleSpeed     = 1.5f;
     float m_paddleInfluence = 0.5f;
     float m_maxPuckSpeed    = 2.5f;
 };

@@ -1,9 +1,20 @@
 #include "app/Application.h"
 
-using namespace std;
+#ifdef EMSCRIPTEN
+#include "platform/WebFactory.h"
+#else
+#include "platform/DesktopFactory.h"
+#endif
 
 int main()
 {
-    Application app;
+    std::unique_ptr<PlatformFactory> factory;
+#ifdef EMSCRIPTEN
+    factory = std::make_unique<WebFactory>();
+#else
+    factory = std::make_unique<DesktopFactory>();
+#endif
+
+    Application app(std::move(factory));
     return app.run();
 }

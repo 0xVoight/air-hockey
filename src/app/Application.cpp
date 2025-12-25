@@ -1,14 +1,12 @@
 #include "Application.h"
 
 #include "platform/IWindow.h"
-#include "platform/GlfwWindow.h"
+#include "render/IRenderer.h"
 
 #include "core/Game.h"
 
-#include "render/IRenderer.h"
-#include "render/OpenGLRenderer.h"
 
-Application::Application() : m_running(false), m_isPaused(false) {}
+Application::Application(std::unique_ptr<PlatformFactory> factory) : m_running(false), m_isPaused(false), m_factory(std::move(factory)) {}
 Application::~Application() = default;
 
 int Application::run()
@@ -21,13 +19,8 @@ int Application::run()
 
 void Application::init()
 {
-#ifdef EMSCRIPTEN
-    m_window   = std::make_unique<EmsWindow>(1280, 720, "Air Hockey");
-    m_renderer = std::make_unique<WebGLRenderer>(*m_window);
-#else
-    m_window   = std::make_unique<GlfwWindow>(1280, 720, "Air Hockey");
-    m_renderer = std::make_unique<OpenGLRenderer>(*m_window);
-#endif
+    m_window   = m_factory->createWindow(1280, 720, "Air Hockey");
+    m_renderer = m_factory->createRenderer(*m_window);
 
     m_game = std::make_unique<Game>();
     m_running = true;

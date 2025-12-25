@@ -104,7 +104,7 @@ void PhysicsWorld::processPaddleMovement(Paddle &paddle, const PlayerInput &pInp
         paddle.velocity = Vec2(0.0f);
     }
 
-    paddle.position += paddle.velocity * dt;
+    //paddle.position += paddle.velocity * dt;
 
     // Расчет границ
     const float r = paddle.radius;

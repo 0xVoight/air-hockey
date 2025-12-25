@@ -14,6 +14,7 @@ OpenGLRenderer::OpenGLRenderer(const IWindow& window)
     glOrtho(0, m_window.width(), 0, m_window.height(), -1, 1);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
+    precomputeCircleGeometry(64);
 }
 
 OpenGLRenderer::~OpenGLRenderer() = default;
@@ -81,15 +82,27 @@ void OpenGLRenderer::endFrame()
 {
 }
 
-void OpenGLRenderer::drawCircle(float x, float y, float radius, int segments)
+void OpenGLRenderer::drawCircle(float x, float y, float radius)
 {
     glBegin(GL_TRIANGLE_FAN);
     glVertex2f(x, y);
-    for(int i = 0; i <= segments; ++i) {
-        float angle = i / (float)segments * 2.f * 3.1415926f;
-        float vx = x + std::cos(angle) * radius;
-        float vy = y + std::sin(angle) * radius;
-        glVertex2f(vx, vy);
+
+    for (const auto& vertex : m_unitCircleVertices) {
+        glVertex2f(x + vertex.x * radius, y + vertex.y * radius);
     }
     glEnd();
+}
+
+void OpenGLRenderer::precomputeCircleGeometry(int segments)
+{
+    m_unitCircleVertices.clear();
+    m_unitCircleVertices.reserve(segments + 1);
+
+    for (int i = 0; i <= segments; ++i) {
+        float angle = i / (float)segments * 2.0f * glm::pi<float>();
+        m_unitCircleVertices.push_back({
+            std::cos(angle),
+            std::sin(angle)
+        });
+    }
 }
