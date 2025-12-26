@@ -6,16 +6,22 @@ Game::Game() : m_rng(std::random_device{}())
     m_physics.setFriction(0.1f);
     m_physics.setRestitution(0.8f);
 
+    m_aiController = std::make_unique<AIPaddleController>(3.5f);
+
     reset();
 }
 
 void Game::update(const double dt, const InputState& input)
 {
+    m_frameInput = input;
+    if (m_aiController)
+        m_aiController->update(m_frameInput, m_world);
+
     m_accumulator += dt;
 
     while (m_accumulator >= FIXED_DT)
     {
-        fixedUpdate(FIXED_DT, input);
+        fixedUpdate(FIXED_DT, m_frameInput);
         m_accumulator -= FIXED_DT;
     }
 }

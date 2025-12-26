@@ -35,6 +35,7 @@ set(SRC
     src/core/GameEvent.cpp
     src/core/MatchState.cpp
     src/core/Time.cpp
+    src/controllers/AIPaddleController.cpp
     src/physics/PhysicsWorld.cpp
     src/render/OpenGLRenderer.cpp
     src/render/WebGLRenderer.cpp

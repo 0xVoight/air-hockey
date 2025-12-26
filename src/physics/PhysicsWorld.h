@@ -22,9 +22,9 @@ private:
     [[nodiscard]] bool checkGoal(const World& world, const Goal& goal) const;
 
 private:
-    float m_friction = 0.15f; // замедление по воздуху
+    float m_friction = 0.13f; // замедление по воздуху
     float m_restitution = 0.96f; // упругость ударов
-    float m_paddleSpeed = 1.8f;
-    float m_paddleInfluence = 0.6f;
-    float m_maxPuckSpeed = 2.8f;
+    float m_paddleSpeed = 1.97f;
+    float m_paddleInfluence = 0.77f;
+    float m_maxPuckSpeed = 3.3f;
 };

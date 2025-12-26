@@ -70,6 +70,26 @@ void OpenGLRenderer::setupResources()
     m_rinkLinesVAO->addBuffer(m_rinkLinesVBO, lineLayout);
     m_rinkLinesVAO->unbind();
 
+    m_goalShader = std::make_unique<Shader>("assets/shaders/gl_line.vert", "assets/shaders/gl_line.frag");
+
+    std::vector<glm::vec2> goalVerts = {
+        { -0.5f, -0.5f },
+        {  0.5f, -0.5f },
+        {  0.5f,  0.5f },
+        { -0.5f,  0.5f }
+    };
+    m_goalVertexCount = static_cast<uint32_t>(goalVerts.size());
+
+    glGenBuffers(1, &m_goalVBO);
+    glBindBuffer(GL_ARRAY_BUFFER, m_goalVBO);
+    glBufferData(GL_ARRAY_BUFFER, goalVerts.size() * sizeof(glm::vec2), goalVerts.data(), GL_STATIC_DRAW);
+
+    m_goalVAO = std::make_unique<VertexArray>();
+    VertexBufferLayout goalLayout;
+    goalLayout.push<float>(2);
+    m_goalVAO->addBuffer(m_goalVBO, goalLayout);
+    m_goalVAO->unbind();
+
     ///
     m_iceShader = std::make_unique<Shader>("assets/shaders/gl_ice.vert", "assets/shaders/gl_ice.frag");
     m_iceTexture = std::make_unique<Texture>("assets/textures/ice.png");
@@ -145,6 +165,8 @@ void OpenGLRenderer::render(const World& world)
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+    drawGoal(world.leftGoal,  {0.0f, 0.0f, 0.0f});
+    drawGoal(world.rightGoal, {0.0f, 0.0f, 0.0f});
     //Линии
     m_lineShader->use();
     m_lineShader->setMat4("uProjection", m_projection);
@@ -196,6 +218,28 @@ void OpenGLRenderer::drawCircle(const glm::vec2& position, const float radius, c
 
     glDrawArrays(GL_TRIANGLE_FAN, 0, m_circleVertexCount);
 }
+
+void OpenGLRenderer::drawGoal(const Goal& goal, const glm::vec3& color) const
+{
+    const glm::vec2 center = worldToScreen({goal.x, (goal.yMin + goal.yMax) * 0.5f});
+    const float width  = m_goalLineRadius * static_cast<float>(m_window.width());  // толщина линии
+    const float height = (goal.yMax - goal.yMin) * std::min(m_window.width() / m_worldRink.width(),
+                                                           m_window.height() / m_worldRink.height());
+
+    auto model = glm::mat4(1.0f);
+    model = glm::translate(model, glm::vec3(center, 0.f));
+    model = glm::scale(model, glm::vec3(width, height, 1.f));
+
+    m_goalShader->use();
+    m_goalShader->setMat4("uProjection", m_projection);
+    m_goalShader->setMat4("uModel", model);
+    m_goalShader->setVec3("uColor", color);
+
+    m_goalVAO->bind();
+    glDrawArrays(GL_LINE_LOOP, 0, m_goalVertexCount);
+    m_goalVAO->unbind();
+}
+
 
 void OpenGLRenderer::endFrame()
 {

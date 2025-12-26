@@ -1,10 +1,12 @@
 #pragma once
 
+#include <memory>
 #include <random>
 
 #include "GameEvent.h"
 #include "world/World.h"
 #include "physics/PhysicsWorld.h"
+#include "controllers/AIPaddleController.h"
 
 class Game
 {
@@ -32,6 +34,9 @@ private:
 
     GameEventQueue m_events;
     MatchState m_match;
+
+    std::unique_ptr<IPlayerController> m_aiController;
+    InputState m_frameInput;
 
     std::mt19937 m_rng;
 

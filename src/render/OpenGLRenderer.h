@@ -23,6 +23,7 @@ public:
 private:
     void setupResources();
     void drawCircle(const glm::vec2& position, float radius, const glm::vec3& color) const;
+    void drawGoal(const Goal& goal, const glm::vec3& color) const;
     void updateProjection();
     [[nodiscard]] glm::vec2 worldToScreen(const glm::vec2& worldPos) const;
 
@@ -49,6 +50,11 @@ private:
     std::unique_ptr<VertexArray> m_rinkLinesVAO;
     uint32_t m_rinkLinesVBO = 0;
     uint32_t m_rinkLinesVertexCount = 0;
+
+    std::unique_ptr<VertexArray> m_goalVAO;
+    uint32_t m_goalVBO = 0;
+    uint32_t m_goalVertexCount = 0;
+    std::unique_ptr<Shader> m_goalShader;
 
     float m_goalLineRadius = 0.05f;
 
