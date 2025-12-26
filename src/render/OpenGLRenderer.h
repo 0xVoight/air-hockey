@@ -28,6 +28,8 @@ private:
 
 private:
     const IWindow& m_window;
+    float m_lastWidth = 0;
+    float m_lastHeight = 0;
 
     // todo: resource manager
     // лед

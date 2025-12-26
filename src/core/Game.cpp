@@ -1,4 +1,5 @@
 #include "Game.h"
+#include <iostream>
 
 Game::Game() : m_rng(std::random_device{}())
 {
@@ -21,6 +22,20 @@ void Game::update(const double dt, const InputState& input)
 
 void Game::reset()
 {
+    m_world.leftGoal = {
+        m_world.rink.left,
+        -0.25f,
+        0.25f,
+        GoalSide::Left
+    };
+
+    m_world.rightGoal = {
+        m_world.rink.right,
+        -0.25f,
+        0.25f,
+        GoalSide::Right
+    };
+    m_world.goalScoredThisStep = false;
     m_world.puck.position = {0.f, 0.f};
 
     std::uniform_real_distribution<float> angleDist(0.0f, glm::two_pi<float>());
@@ -40,5 +55,47 @@ void Game::reset()
 
 void Game::fixedUpdate(const double fixedDt, const InputState& input)
 {
-    m_physics.simulate(m_world, input, fixedDt);
+    m_physics.simulate(m_world, input, fixedDt, m_events);
+
+    for (const GameEvent& event : m_events.consume())
+    {
+        handleEvent(event);
+    }
+    std::cout << "\r" << "Match score: " << m_match.leftScore() << " : " << m_match.rightScore() << std::flush;
+}
+
+void Game::handleEvent(const GameEvent& event)
+{
+    switch (event.type)
+    {
+    case GameEventType::Goal:
+        {
+            const auto& goal = std::get<GoalEvent>(event.payload);
+            m_match.onGoal(goal.side);
+
+            if (m_match.status() == MatchStatus::Finished)
+            {
+                m_events.push(
+                    GameEvent::makeMatchFinished(*m_match.winner())
+                );
+            }
+            else
+            {
+                m_events.push(GameEvent::makeRoundReset());
+            }
+            break;
+        }
+
+    case GameEventType::RoundReset:
+        reset();
+        break;
+
+    case GameEventType::MatchReset:
+        //resetMatch();
+        break;
+
+    case GameEventType::MatchFinished:
+        m_events.push(GameEvent::makeMatchReset());
+        break;
+    }
 }

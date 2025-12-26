@@ -1,7 +1,7 @@
 #version 460 core
 
-layout(location = 0) in vec2 aPos;       // Позиция вершины (x, y)
-layout(location = 1) in vec2 aTexCoord;  // Текстурные координаты (u, v)
+layout(location = 0) in vec2 aPos;
+layout(location = 1) in vec2 aTexCoord;
 
 out vec2 vTexCoord;
 

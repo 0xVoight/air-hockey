@@ -32,6 +32,8 @@ set(SRC
     src/main.cpp
     src/app/Application.cpp
     src/core/Game.cpp
+    src/core/GameEvent.cpp
+    src/core/MatchState.cpp
     src/core/Time.cpp
     src/physics/PhysicsWorld.cpp
     src/render/OpenGLRenderer.cpp

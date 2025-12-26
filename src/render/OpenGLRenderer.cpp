@@ -92,6 +92,11 @@ void OpenGLRenderer::updateProjection()
     const auto w = static_cast<float>(m_window.width());
     const auto h = static_cast<float>(m_window.height());
 
+    if (w == m_lastWidth && h == m_lastHeight) return;
+
+    m_lastWidth = w;
+    m_lastHeight = h;
+
     m_projection = glm::ortho(0.0f, w, 0.0f, h, -1.0f, 1.0f);
 
     const float iceVerts[] = {
@@ -191,7 +196,6 @@ void OpenGLRenderer::drawCircle(const glm::vec2& position, const float radius, c
 
     glDrawArrays(GL_TRIANGLE_FAN, 0, m_circleVertexCount);
 }
-
 
 void OpenGLRenderer::endFrame()
 {

@@ -2,6 +2,7 @@
 
 #include <random>
 
+#include "GameEvent.h"
 #include "world/World.h"
 #include "physics/PhysicsWorld.h"
 
@@ -22,11 +23,15 @@ public:
 
 private:
     void fixedUpdate(double fixedDt, const InputState& input);
+    void handleEvent(const GameEvent& event);
 
 private:
     World m_world;
     PhysicsWorld m_physics;
     double m_accumulator = 0.0;
+
+    GameEventQueue m_events;
+    MatchState m_match;
 
     std::mt19937 m_rng;
 

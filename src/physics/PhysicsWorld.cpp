@@ -1,11 +1,28 @@
 #include "PhysicsWorld.h"
 
+#include "core/GameEvent.h"
+
 PhysicsWorld::PhysicsWorld() = default;
 
-void PhysicsWorld::simulate(World& world, const InputState& input, const double dt) const
+void PhysicsWorld::simulate(World& world, const InputState& input, const double dt, GameEventQueue& events) const
 {
     processPaddles(world, input);
     moveObjects(world, dt);
+
+    if (!world.goalScoredThisStep && checkGoal(world, world.leftGoal))
+    {
+        events.push(GameEvent::makeGoal(GoalSide::Left));
+        world.goalScoredThisStep = true;
+        return;
+    }
+
+    if (!world.goalScoredThisStep && checkGoal(world, world.rightGoal))
+    {
+        events.push(GameEvent::makeGoal(GoalSide::Right));
+        world.goalScoredThisStep = true;
+        return;
+    }
+
     handleCollisions(world);
 }
 
@@ -42,24 +59,24 @@ void PhysicsWorld::handleCollisions(World& world) const
         glm::vec2& puckPos = world.puck.position;
         glm::vec2& puckVel = world.puck.velocity;
 
-        glm::vec2 delta = puckPos - paddle.position;
-        float distSq = glm::dot(delta, delta);
+        const glm::vec2 delta = puckPos - paddle.position;
+        const float distSq = glm::dot(delta, delta);
         float rSum = world.puck.radius + paddle.radius;
 
         if (distSq < rSum * rSum)
         {
             float dist = std::sqrt(distSq);
             if (dist < 1e-4f) dist = 1e-4f;
-            glm::vec2 normal = delta / dist;
+            const glm::vec2 normal = delta / dist;
 
             puckPos += normal * (rSum - dist);
 
-            glm::vec2 relativeVelocity = puckVel - paddle.velocity;
+            const glm::vec2 relativeVelocity = puckVel - paddle.velocity;
             float velAlongNormal = glm::dot(relativeVelocity, normal);
 
             if (velAlongNormal < 0)
             {
-                float j = -(1.0f + m_restitution) * velAlongNormal;
+                const float j = -(1.0f + m_restitution) * velAlongNormal;
                 puckVel += (j * normal) + (paddle.velocity * m_paddleInfluence);
             }
 
@@ -99,6 +116,30 @@ void PhysicsWorld::handleCollisions(World& world) const
         world.puck.position.y = rink.top - r;
         world.puck.velocity.y = -std::abs(world.puck.velocity.y) * m_restitution;
     }
+}
+
+bool PhysicsWorld::checkGoal(const World& world, const Goal& goal) const
+{
+    const auto& puck = world.puck;
+
+    if (goal.side == GoalSide::Left)
+    {
+        if (puck.position.x - puck.radius <= goal.x)
+        {
+            return puck.position.y >= goal.yMin &&
+                puck.position.y <= goal.yMax;
+        }
+    }
+    else
+    {
+        if (puck.position.x + puck.radius >= goal.x)
+        {
+            return puck.position.y >= goal.yMin &&
+                puck.position.y <= goal.yMax;
+        }
+    }
+
+    return false;
 }
 
 void PhysicsWorld::processPaddles(World& world, const InputState& input) const
